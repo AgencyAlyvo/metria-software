@@ -1,0 +1,16 @@
+---
+description: Conventions du software desktop Metria (Tauri 2 + Nuxt 4)
+alwaysApply: true
+---
+
+# metria-software — règles du repo
+
+- Consulter les skills globaux `tauri` et `nuxt` (docs officielles mirrorées) avant d'utiliser une API dont on n'est pas sûr — ne jamais inventer une API Tauri 2 ou Nuxt 4.
+- Structure héritée d'alyvo-entretien : `src-nuxt/` (Nuxt 4, `srcDir: app`, `ssr: false` obligatoire pour Tauri), `src-tauri/` (Rust, fenêtre frameless + `WindowBar`), `src-core/` (TS partagé via l'alias `#src-core`).
+- UI : Nuxt UI v4 + Tailwind v4 + Pinia + police Manrope. Pour les modèles IA : libellés grand public, nom technique du modèle seulement entre parenthèses.
+- Backend : toutes les requêtes passent par `runtimeConfig.public.apiBaseUrl` (`NUXT_PUBLIC_BASE_URL_API`) vers core-api ; contrat auth `{type:'bearer', value, expiresAt}` ; header `Authorization: Bearer`.
+- Identifiants d'app : `com.metria.app` (+ `.dev`/`.staging`) ; updater Tauri pointé sur l'endpoint de core-api.
+- Flux fenêtres : `/` (écran update, 290×380) → `/login` (400×595) ↔ `/signup` → `/home` (1280×720, gardé par `auth.global`). L'écran update vérifie les mises à jour en prod/staging et les saute en dev (gate corrigé par rapport à prospectresearch).
+- Sécurité Tauri : capabilities minimales (fs limité à `$DATA`, http limité à l'API Metria) — pas de scope large.
+- Tooling conservé : eslint / prettier / husky / commitlint (conventional commits) / vitest.
+- Secrets : jamais commis. Toute idée hors plan va dans `BACKLOG.md` à la racine du workspace Metria.
