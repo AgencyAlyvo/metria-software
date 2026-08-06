@@ -1,0 +1,28 @@
+---
+description: Metria — milestones SemVer et petites PRs (anti-megapr)
+alwaysApply: true
+---
+
+# Git delivery — Metria
+
+## Milestones = SemVer uniquement
+
+- Titre milestone = `vX.Y.Z` uniquement (`^v\d+\.\d+\.\d+$`). **Interdit** : « Fondations V1 », marketing, narratif.
+- Scope libre dans la **description** GitHub du milestone, pas dans le titre.
+- SemVer **indépendant par repo**.
+- Mapping : 1ʳᵉ vague shippable = `v0.1.0` ; nouvelles slices = minor ; correctifs = patch.
+- Agents : shipper PREP crée/renomme ; architect suggère seulement un `vX.Y.Z`.
+
+## Petites PRs (anti-megapr)
+
+- **1 issue = 1 intention = 1 PR**. Interdit : une PR « fondations complètes ».
+- Critères : un seul sujet / flux UI ; idéalement ≤ ~15 fichiers hors lock/généré.
+- Conventional commits inchangés. Historique mergé : forward-only.
+
+## Slices software (ordre de merge)
+
+1. base Tauri 2 + Nuxt 4 strippée + tooling (deps à jour)
+2. écrans auth (login/signup) + stores + HttpClient → core-api
+3. shell `/home` + gate updater corrigé
+4. pricing + bandeau essai + redirect 402
+5. pages « Choix de l'IA » + « Consommation »
