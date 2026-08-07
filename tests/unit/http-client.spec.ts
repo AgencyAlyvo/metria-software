@@ -1,16 +1,11 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock } from 'vitest'
 
-const {
-  resolveFetchMock,
-  fetchMock,
-  useAuthStoreMock,
-}: { resolveFetchMock: Mock; fetchMock: Mock; useAuthStoreMock: Mock } = vi.hoisted(
-  (): { resolveFetchMock: Mock; fetchMock: Mock; useAuthStoreMock: Mock } => {
+const { resolveFetchMock, fetchMock }: { resolveFetchMock: Mock; fetchMock: Mock } = vi.hoisted(
+  (): { resolveFetchMock: Mock; fetchMock: Mock } => {
     return {
       resolveFetchMock: vi.fn(),
       fetchMock: vi.fn(),
-      useAuthStoreMock: vi.fn(),
     }
   },
 )
@@ -24,17 +19,6 @@ vi.mock('#src-core/utils/http', (): Record<string, unknown> => {
      */
     resolveFetch: (...args: unknown[]): unknown => resolveFetchMock(...args),
     extractHttpError: vi.fn(),
-  }
-})
-
-vi.mock('#src-nuxt/app/stores/auth.store', (): Record<string, unknown> => {
-  return {
-    /**
-     * Mock useAuthStore.
-     * @param {...unknown[]} args - Arguments.
-     * @returns {unknown} Résultat mock.
-     */
-    useAuthStore: (...args: unknown[]): unknown => useAuthStoreMock(...args),
   }
 })
 
@@ -55,17 +39,20 @@ function jsonResponse(status: number, body: unknown): Response {
 }
 
 describe('HttpClientService', (): void => {
+  let authToken: string | undefined
+
   beforeEach((): void => {
     vi.clearAllMocks()
     resolveFetchMock.mockReturnValue(fetchMock)
-    useAuthStoreMock.mockReturnValue({ authToken: 'jwt-token' })
-    vi.stubGlobal('useRuntimeConfig', (): { public: { apiBaseUrl: string } } => {
-      return { public: { apiBaseUrl: 'http://localhost:8080' } }
+    authToken = 'jwt-token'
+    HttpClientService.configure({
+      apiBaseUrl: 'http://localhost:8080',
+      /**
+       * Getter token de test.
+       * @returns {string | undefined} Token courant.
+       */
+      getAuthToken: (): string | undefined => authToken,
     })
-  })
-
-  afterEach((): void => {
-    vi.unstubAllGlobals()
   })
 
   it('ajoute Authorization Bearer et sérialise la query', async (): Promise<void> => {
@@ -97,15 +84,20 @@ describe('HttpClientService', (): void => {
   })
 
   it('échoue si apiBaseUrl est absent', async (): Promise<void> => {
-    vi.stubGlobal('useRuntimeConfig', (): { public: { apiBaseUrl: string } } => {
-      return { public: { apiBaseUrl: '' } }
+    HttpClientService.configure({
+      apiBaseUrl: '',
+      /**
+       * Getter token de test.
+       * @returns {string | undefined} Token courant.
+       */
+      getAuthToken: (): string | undefined => authToken,
     })
 
     await expect(HttpClientService.request('/me')).rejects.toThrow('API base URL is not configured')
   })
 
-  it('ommet Authorization si le store n’a pas de token', async (): Promise<void> => {
-    useAuthStoreMock.mockReturnValue({ authToken: undefined })
+  it('omet Authorization si le getter ne fournit pas de token', async (): Promise<void> => {
+    authToken = undefined
     fetchMock.mockResolvedValue(jsonResponse(200, { ok: true }))
 
     await HttpClientService.request('/public')
@@ -139,5 +131,21 @@ describe('HttpClientService', (): void => {
     await expect(HttpClientService.request('/me')).rejects.toSatisfy((error: unknown): boolean => {
       return error instanceof ApiHttpError && error.status === 502 && error.message === 'HTTP 502'
     })
+  })
+
+  it('normalise le slash final de apiBaseUrl au configure', async (): Promise<void> => {
+    HttpClientService.configure({
+      apiBaseUrl: 'http://localhost:8080/',
+      /**
+       * Getter token de test.
+       * @returns {string | undefined} Token courant.
+       */
+      getAuthToken: (): string | undefined => authToken,
+    })
+    fetchMock.mockResolvedValue(jsonResponse(200, { ok: true }))
+
+    await HttpClientService.request('/me')
+
+    expect(fetchMock).toHaveBeenCalledWith('http://localhost:8080/me', expect.any(Object))
   })
 })

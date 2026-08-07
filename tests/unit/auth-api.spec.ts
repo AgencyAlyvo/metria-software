@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock } from 'vitest'
 
 const { resolveFetchMock, fetchMock }: { resolveFetchMock: Mock; fetchMock: Mock } = vi.hoisted(
@@ -42,13 +42,7 @@ describe('AuthApiService', (): void => {
   beforeEach((): void => {
     vi.clearAllMocks()
     resolveFetchMock.mockReturnValue(fetchMock)
-    vi.stubGlobal('useRuntimeConfig', (): { public: { apiBaseUrl: string } } => {
-      return { public: { apiBaseUrl: 'http://localhost:8080/' } }
-    })
-  })
-
-  afterEach((): void => {
-    vi.unstubAllGlobals()
+    AuthApiService.configure('http://localhost:8080/')
   })
 
   it('appelle POST /signin avec le payload et retourne le bearer', async (): Promise<void> => {
@@ -143,9 +137,7 @@ describe('AuthApiService', (): void => {
   })
 
   it('échoue si apiBaseUrl est absent', async (): Promise<void> => {
-    vi.stubGlobal('useRuntimeConfig', (): { public: { apiBaseUrl: string } } => {
-      return { public: { apiBaseUrl: '' } }
-    })
+    AuthApiService.configure('')
 
     await expect(AuthApiService.signIn({ email: 'a@b.c', password: 'x' })).rejects.toThrow(
       'API base URL is not configured',
@@ -166,9 +158,7 @@ describe('AuthApiService', (): void => {
   })
 
   it('ignore signOut si apiBaseUrl est absent', async (): Promise<void> => {
-    vi.stubGlobal('useRuntimeConfig', (): { public: { apiBaseUrl: string } } => {
-      return { public: { apiBaseUrl: '' } }
-    })
+    AuthApiService.configure('')
 
     await expect(AuthApiService.signOut('token')).resolves.toBeUndefined()
     expect(fetchMock).not.toHaveBeenCalled()

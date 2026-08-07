@@ -5,15 +5,29 @@ import { ApiHttpError, type ApiErrorBody } from '#src-core/types/http/api-http-e
 
 /**
  * Service dédié aux appels HTTP vers les endpoints d'authentification core-api.
+ * L'URL de base doit être injectée via configure() depuis le bootstrap Nuxt (plugin).
  */
 export class AuthApiService {
   /**
-   * Résout l'URL de base de l'API depuis la configuration Nuxt runtime.
+   * URL de base de l'API injectée au démarrage (sans slash final).
+   */
+  private static _apiBaseUrl: string = ''
+
+  /**
+   * Injecte l'URL de base de l'API.
+   * @param {string} apiBaseUrl - URL publique core-api (`runtimeConfig.public.apiBaseUrl`).
+   * @returns {void}
+   */
+  public static configure(apiBaseUrl: string): void {
+    this._apiBaseUrl = apiBaseUrl.trim().replace(/\/$/, '')
+  }
+
+  /**
+   * Résout l'URL de base de l'API injectée.
    * @returns {string} URL de base normalisée.
    */
   private static resolveBaseUrl(): string {
-    const runtimeConfig: ReturnType<typeof useRuntimeConfig> = useRuntimeConfig()
-    return String(runtimeConfig.public.apiBaseUrl || '').replace(/\/$/, '')
+    return this._apiBaseUrl
   }
 
   /**

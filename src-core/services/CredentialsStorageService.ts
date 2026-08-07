@@ -11,7 +11,9 @@ export type StoredCredentials = {
 
 /**
  * Service de persistance des identifiants sur le système de fichiers OS.
- * Les données sont encodées en base64 (UTF-8) avant écriture pour éviter le stockage en clair.
+ * Les données sont encodées en base64 (UTF-8) avant écriture : ce n'est pas un chiffrement
+ * (lisible après décodage). Objectif : éviter le plaintext brut dans le fichier uniquement ;
+ * un stockage sécurisé (keychain OS) pourra remplacer ce mécanisme plus tard.
  *
  * L'identifiant de l'application doit être injecté via configure() au démarrage
  * (plugin Nuxt credentials-storage.client.ts) pour que le chemin du fichier

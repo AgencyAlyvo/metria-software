@@ -1,4 +1,3 @@
-import { useAuthStore } from '#src-nuxt/app/stores/auth.store'
 import { resolveFetch } from '#src-core/utils/http'
 import { ApiHttpError, type ApiErrorBody } from '#src-core/types/http/api-http-error'
 
@@ -13,16 +12,45 @@ type HttpClientRequestOptions = {
 }
 
 /**
+ * Configuration injectée depuis le bootstrap Nuxt (plugin).
+ */
+export type HttpClientServiceConfig = {
+  apiBaseUrl: string
+  getAuthToken: () => string | undefined
+}
+
+/**
  * Client HTTP authentifié pour l'API Metria core-api.
+ * Ne dépend pas de Nuxt/Pinia : l'URL et le getter de token sont injectés via configure().
  */
 export class HttpClientService {
   /**
-   * Résout l'URL de base de l'API.
+   * URL de base de l'API injectée au démarrage (sans slash final).
+   */
+  private static _apiBaseUrl: string = ''
+
+  /**
+   * Getter du token bearer injecté au démarrage (ex. depuis le store auth côté Nuxt).
+   * @returns {string | undefined} Token courant ou undefined.
+   */
+  private static _getAuthToken: () => string | undefined = (): string | undefined => undefined
+
+  /**
+   * Injecte l'URL de base et le port de lecture du token d'auth.
+   * @param {HttpClientServiceConfig} config - Configuration runtime.
+   * @returns {void}
+   */
+  public static configure(config: HttpClientServiceConfig): void {
+    this._apiBaseUrl = config.apiBaseUrl.trim().replace(/\/$/, '')
+    this._getAuthToken = config.getAuthToken
+  }
+
+  /**
+   * Résout l'URL de base de l'API injectée.
    * @returns {string} URL de base normalisée.
    */
   private static resolveBaseUrl(): string {
-    const runtimeConfig: ReturnType<typeof useRuntimeConfig> = useRuntimeConfig()
-    return String(runtimeConfig.public.apiBaseUrl || '').replace(/\/$/, '')
+    return this._apiBaseUrl
   }
 
   /**
@@ -81,7 +109,7 @@ export class HttpClientService {
    */
   public static async request<T>(path: string, options: HttpClientRequestOptions = {}): Promise<T> {
     const baseURL: string = this.resolveBaseUrl()
-    const authStore: ReturnType<typeof useAuthStore> = useAuthStore()
+    const authToken: string | undefined = this._getAuthToken()
 
     if (!baseURL) {
       throw new Error('API base URL is not configured')
@@ -99,7 +127,7 @@ export class HttpClientService {
 
     const headers: Record<string, string> = {
       Accept: 'application/json',
-      ...(authStore.authToken ? { Authorization: `Bearer ${authStore.authToken}` } : {}),
+      ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
       ...options.headers,
     }
 
