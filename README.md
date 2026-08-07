@@ -31,7 +31,7 @@ Variables publiques (pas de secrets) :
 npm run web:run:dev:spa
 ```
 
-Ouvre http://localhost:1470 — page placeholder « Metria ».
+Ouvre http://localhost:1470 — écran update (skip en `development`) puis `/login`.
 
 ### Desktop Tauri
 
@@ -39,7 +39,7 @@ Ouvre http://localhost:1470 — page placeholder « Metria ».
 npm run desktop:run:dev
 ```
 
-Compile le front (static + spa) puis lance la fenêtre frameless.
+Compile le front (static + spa) puis lance la fenêtre frameless (290×380 sur `/`).
 
 ### Gates qualité
 
@@ -52,8 +52,16 @@ npm run desktop:check:compile
 ## Structure
 
 - `src-nuxt/` — Nuxt 4 (`srcDir: app`), Nuxt UI v4, Tailwind v4, Pinia, Manrope
-- `src-tauri/` — shell Rust (plugins fs / http / opener), capabilities minimales
+- `src-tauri/` — shell Rust (plugins fs / http / opener / updater / process / os), capabilities minimales
 - `src-core/` — TS partagé (`#src-core`), SettingsStorage générique
+
+## Fenêtres & updater
+
+Flux : `/` (update, 290×380) → `/login`|`/signup` (400×595) → `/home` (1280×720, layout shell).
+
+- Gate update : **check en `production` / `staging`**, **skip en `development`** (correctif vs prospectresearch).
+- Endpoint Tauri : core-api `GET /software/updater/{{target}}/{{arch}}/{{current_version}}` (204 = à jour).
+- Signature : `pubkey` dans `src-tauri/tauri.conf.json`. Builds signés : fournir `TAURI_SIGNING_PRIVATE_KEY` (jamais committer la clé privée).
 
 ## Dépendances
 
@@ -61,4 +69,4 @@ Bump npm (ncu) et crates.io appliqués dans la mesure où le build reste vert. M
 
 ## Slice actuelle
 
-**(a)** base strippée + tooling. Next : **(b)** auth screens + stores.
+**(c)** shell `/home` + updater gate. Next : **(d)** pricing / essai.

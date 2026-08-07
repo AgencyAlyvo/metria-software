@@ -54,6 +54,21 @@ export class TauriWindowService {
   }
 
   /**
+   * Configure la fenêtre pour l'écran de vérification des mises à jour.
+   * @returns {Promise<void>}
+   */
+  public static async configureUpdateWindow(): Promise<void> {
+    await this.configureCurrentWindow({
+      width: 290,
+      height: 380,
+      center: true,
+      resizable: false,
+      decorations: false,
+      maximized: false,
+    })
+  }
+
+  /**
    * Configure la fenêtre pour la page de connexion.
    * @param {boolean} center - Centre la fenêtre si true, conserve sa position sinon.
    * @returns {Promise<void>}
