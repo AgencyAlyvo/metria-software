@@ -8,6 +8,9 @@ export default defineConfig({
       '#src-nuxt': fileURLToPath(new URL('./src-nuxt', import.meta.url)),
     },
   },
+  define: {
+    'import.meta.client': 'true',
+  },
   test: {
     environment: 'node',
     globals: false,
