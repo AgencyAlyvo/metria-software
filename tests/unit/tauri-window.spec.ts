@@ -100,6 +100,17 @@ describe('TauriWindowService', (): void => {
     isMaximizedMock.mockResolvedValue(false)
   })
 
+  it('configure la fenêtre update 290×380 non redimensionnable', async (): Promise<void> => {
+    await TauriWindowService.configureUpdateWindow()
+
+    expect(setDecorationsMock).toHaveBeenCalledWith(false)
+    expect(setResizableMock).toHaveBeenCalledWith(false)
+    expect(setSizeMock).toHaveBeenCalled()
+    expect(LogicalSizeMock).toHaveBeenCalledWith(290, 380)
+    expect(centerMock).toHaveBeenCalled()
+    expect(maximizeMock).not.toHaveBeenCalled()
+  })
+
   it('configure la fenêtre login 400×595 non redimensionnable', async (): Promise<void> => {
     await TauriWindowService.configureLoginWindow(true)
 

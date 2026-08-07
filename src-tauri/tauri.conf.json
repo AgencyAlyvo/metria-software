@@ -14,11 +14,9 @@
     "windows": [
       {
         "fullscreen": false,
-        "width": 1180,
-        "height": 760,
-        "minWidth": 900,
-        "minHeight": 600,
-        "resizable": true,
+        "width": 290,
+        "height": 380,
+        "resizable": false,
         "title": "Metria",
         "decorations": false,
         "center": true,
@@ -67,7 +65,7 @@
     "withGlobalTauri": false
   },
   "bundle": {
-    "createUpdaterArtifacts": false,
+    "createUpdaterArtifacts": true,
     "active": true,
     "category": "Business",
     "copyright": "Metria",
@@ -114,6 +112,14 @@
   "plugins": {
     "fs": {
       "requireLiteralLeadingDot": false
+    },
+    "updater": {
+      "windows": {
+        "installMode": "passive"
+      },
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDIzNTgzQkNCNDBGOThFQUMKUldTc2p2bEF5enRZSXhvaHBKbXA0VGJ0UzMxNDhmQitLYXZsOHdTZ0wreGpQaGNLUEdrUVY5WkIK",
+      "endpoints": ["http://localhost:8080/software/updater/{{target}}/{{arch}}/{{current_version}}"],
+      "dangerousInsecureTransportProtocol": true
     }
   }
 }
