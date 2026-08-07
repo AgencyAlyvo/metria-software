@@ -1,0 +1,34 @@
+[package]
+name = "metria"
+version = "0.0.0"
+description = "Metria — desktop SaaS multi-métiers (Tauri 2 + Nuxt 4)"
+authors = ["AgencyAlyvo"]
+repository = "https://github.com/AgencyAlyvo/metria-software"
+edition = "2024"
+rust-version = "1.95.0"
+
+[lib]
+name = "metria_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.6.3", features = [] }
+
+[dependencies]
+tauri = { version = "2.11.5", features = ["macos-private-api", "image-ico", "image-png"] }
+tauri-plugin-opener = "2.5.4"
+tauri-plugin-fs = "2.5.1"
+tauri-plugin-http = "2.5.9"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+
+[profile.dev]
+panic = "abort"
+opt-level = 0
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true
