@@ -13,10 +13,13 @@ type HttpClientRequestOptions = {
 
 /**
  * Configuration injectée depuis le bootstrap Nuxt (plugin).
+ * `onPaymentRequired` est un callback injecté (ex. navigation `/pricing`) —
+ * le core ne doit jamais importer Nuxt/vue-router.
  */
 export type HttpClientServiceConfig = {
   apiBaseUrl: string
   getAuthToken: () => string | undefined
+  onPaymentRequired?: () => void
 }
 
 /**
@@ -36,6 +39,12 @@ export class HttpClientService {
   private static _getAuthToken: () => string | undefined = (): string | undefined => undefined
 
   /**
+   * Callback optionnel invoqué avant de lever l'erreur sur HTTP 402 (abonnement/essai).
+   * @returns {void}
+   */
+  private static _onPaymentRequired: (() => void) | undefined = undefined
+
+  /**
    * Injecte l'URL de base et le port de lecture du token d'auth.
    * @param {HttpClientServiceConfig} config - Configuration runtime.
    * @returns {void}
@@ -43,6 +52,7 @@ export class HttpClientService {
   public static configure(config: HttpClientServiceConfig): void {
     this._apiBaseUrl = config.apiBaseUrl.trim().replace(/\/$/, '')
     this._getAuthToken = config.getAuthToken
+    this._onPaymentRequired = config.onPaymentRequired
   }
 
   /**
@@ -144,6 +154,10 @@ export class HttpClientService {
     const response: Response = await resolveFetch()(`${baseURL}${fullPath}`, init)
 
     if (!response.ok) {
+      if (response.status === 402) {
+        this._onPaymentRequired?.()
+      }
+
       throw await this.toHttpError(response)
     }
 

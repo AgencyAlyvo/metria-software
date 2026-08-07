@@ -57,7 +57,7 @@ npm run desktop:check:compile
 
 ## Fenêtres & updater
 
-Flux : `/` (update, 290×380) → `/login`|`/signup` (400×595) → `/home` (1280×720, layout shell).
+Flux : `/` (update, 290×380) → `/login`|`/signup` (400×595) → `/home` (1280×720, layout shell) ↔ `/pricing`.
 
 - Gate update : **check en `production` / `staging`**, **skip en `development`** (correctif vs prospectresearch).
 - Endpoint Tauri : core-api `GET /software/updater/{{target}}/{{arch}}/{{current_version}}` (204 = à jour).
@@ -67,6 +67,13 @@ Flux : `/` (update, 290×380) → `/login`|`/signup` (400×595) → `/home` (128
 
 Bump npm (ncu) et crates.io appliqués dans la mesure où le build reste vert. Majors différés volontairement : `pinia` 4 / `@pinia/nuxt` 1, `typescript` 7, `npm-check-updates` 23.
 
+## Pricing / essai
+
+- Page informative `/pricing` (plan Business 499 €/mois, essai 5 j, conso IA à l’usage, modèles locaux « bientôt disponible »).
+- Pas de checkout Stripe (BACKLOG).
+- Bandeau shell « essai : J-x » — **placeholder local** (`SubscriptionTrialService`) car core-api n’expose pas encore `GET /subscription` (`trialEndsAt`). Brancher l’API dès dispo.
+- `HttpClientService` : HTTP 402 → callback injecté → navigation `/pricing` (pas d’import Nuxt dans `src-core`).
+
 ## Slice actuelle
 
-**(c)** shell `/home` + updater gate. Next : **(d)** pricing / essai.
+**(d)** pricing / essai. Next : **(e)** choix IA + consommation.
