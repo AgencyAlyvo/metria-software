@@ -2,7 +2,8 @@ import { useAuthStore } from '#src-nuxt/app/stores/auth.store'
 import type { RouteLocationNormalized } from 'vue-router'
 
 export default defineNuxtRouteMiddleware((to: RouteLocationNormalized) => {
-  const requiresAuth: boolean = to.path.startsWith('/home') || to.path === '/pricing'
+  const requiresAuth: boolean =
+    to.path.startsWith('/home') || to.path === '/pricing' || to.path === '/ai' || to.path === '/consommation'
 
   if (!requiresAuth) {
     return
