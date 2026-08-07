@@ -57,7 +57,7 @@ npm run desktop:check:compile
 
 ## Fenêtres & updater
 
-Flux : `/` (update, 290×380) → `/login`|`/signup` (400×595) → `/home` (1280×720, layout shell) ↔ `/pricing`.
+Flux : `/` (update, 290×380) → `/login`|`/signup` (400×595) → `/home` (1280×720, layout shell) ↔ `/pricing` · `/ai` · `/consommation`.
 
 - Gate update : **check en `production` / `staging`**, **skip en `development`** (correctif vs prospectresearch).
 - Endpoint Tauri : core-api `GET /software/updater/{{target}}/{{arch}}/{{current_version}}` (204 = à jour).
@@ -74,6 +74,12 @@ Bump npm (ncu) et crates.io appliqués dans la mesure où le build reste vert. M
 - Bandeau shell « essai : J-x » — **placeholder local** (`SubscriptionTrialService`) car core-api n’expose pas encore `GET /subscription` (`trialEndsAt`). Brancher l’API dès dispo.
 - `HttpClientService` : HTTP 402 → callback injecté → navigation `/pricing` (pas d’import Nuxt dans `src-core`).
 
+## Choix IA / consommation
+
+- Page `/ai` — catalogue grand public (Anthropic premium, OpenAI, modèles locaux « bientôt disponible »), préférence via `GET|PUT /tenants/me/ai-preference`.
+- Page `/consommation` — coût organisation + utilisateur courant via `GET /usage?from&to` (plage : mois UTC en cours).
+- Accès depuis le shell `/home`.
+
 ## Slice actuelle
 
-**(d)** pricing / essai. Next : **(e)** choix IA + consommation.
+**(e)** choix IA + consommation — dernière slice `v0.1.0` software. Next : smoke E2E.
