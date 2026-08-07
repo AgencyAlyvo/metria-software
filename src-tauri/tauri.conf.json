@@ -1,0 +1,119 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Metria",
+  "mainBinaryName": "Metria",
+  "version": "0.0.0",
+  "identifier": "com.metria.app",
+  "build": {
+    "frontendDist": "../src-nuxt/.output/public/",
+    "devUrl": "http://localhost:1470",
+    "beforeDevCommand": "tsx src-tauri/scripts/beforeDevCommand.ts",
+    "beforeBuildCommand": "tsx src-tauri/scripts/beforeBuildCommand.ts"
+  },
+  "app": {
+    "windows": [
+      {
+        "fullscreen": false,
+        "width": 1180,
+        "height": 760,
+        "minWidth": 900,
+        "minHeight": 600,
+        "resizable": true,
+        "title": "Metria",
+        "decorations": false,
+        "center": true,
+        "alwaysOnTop": false,
+        "contentProtected": true,
+        "visible": true,
+        "url": "/",
+        "label": "main"
+      }
+    ],
+    "enableGTKAppId": false,
+    "macOSPrivateApi": true,
+    "security": {
+      "csp": {
+        "default-src": "'self' customprotocol: asset:",
+        "connect-src": [
+          "'self'",
+          "ipc:",
+          "http://ipc.localhost",
+          "ws://localhost:1470",
+          "http://localhost:8080",
+          "https://api.iconify.design"
+        ],
+        "script-src": "'self'",
+        "style-src": "'self' 'unsafe-inline'",
+        "img-src": ["'self'", "asset:", "http://asset.localhost", "data:", "blob:"],
+        "media-src": ["'self'", "asset:", "http://asset.localhost", "data:", "blob:"],
+        "font-src": "'self'",
+        "object-src": "'none'",
+        "frame-src": "'none'"
+      },
+      "assetProtocol": {
+        "enable": false,
+        "scope": []
+      },
+      "capabilities": ["default"],
+      "dangerousDisableAssetCspModification": false,
+      "freezePrototype": false,
+      "headers": {
+        "X-Content-Type-Options": "nosniff"
+      },
+      "pattern": {
+        "use": "brownfield"
+      }
+    },
+    "withGlobalTauri": false
+  },
+  "bundle": {
+    "createUpdaterArtifacts": false,
+    "active": true,
+    "category": "Business",
+    "copyright": "Metria",
+    "longDescription": "Metria desktop application (Tauri 2 + Nuxt 4).",
+    "shortDescription": "Metria desktop application.",
+    "license": "Proprietary",
+    "licenseFile": "./legal/LICENSE.txt",
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/64x64.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico",
+      "icons/icon.png"
+    ],
+    "publisher": "Metria",
+    "resources": [],
+    "externalBin": [],
+    "fileAssociations": [],
+    "homepage": "https://github.com/AgencyAlyvo/metria-software",
+    "useLocalToolsDir": false,
+    "macOS": {
+      "minimumSystemVersion": "11.0",
+      "files": {},
+      "hardenedRuntime": true,
+      "entitlements": null,
+      "frameworks": [],
+      "providerShortName": null,
+      "signingIdentity": null,
+      "dmg": {}
+    },
+    "windows": {
+      "webviewInstallMode": {
+        "silent": true,
+        "type": "offlineInstaller"
+      },
+      "allowDowngrades": false,
+      "nsis": null,
+      "wix": null
+    }
+  },
+  "plugins": {
+    "fs": {
+      "requireLiteralLeadingDot": false
+    }
+  }
+}
