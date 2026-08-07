@@ -3,6 +3,7 @@ import type { Ref } from 'vue'
 
 import { AuthApiService } from '#src-core/services/AuthApiService'
 import { CredentialsStorageService } from '#src-core/services/CredentialsStorageService'
+import { SubscriptionTrialService } from '#src-core/services/SubscriptionTrialService'
 import type { LoginPayload, SignUpPayload } from '#src-core/types/payload/auth.types'
 import type { SignInResponse, SignUpResponse } from '#src-core/types/response/auth.types'
 
@@ -122,6 +123,8 @@ export const useAuthStore: UseAuthStore = defineStore('auth', (): AuthStoreSetup
     const response: SignUpResponse = await AuthApiService.signUp(credentials)
     applyAuthTokenResponse(response, 'signup')
     applyUserEmail(credentials.email)
+    // Placeholder trialEndsAt local — remplacer quand core exposera GET /subscription.
+    SubscriptionTrialService.startLocalTrial()
   }
 
   /**
@@ -141,6 +144,7 @@ export const useAuthStore: UseAuthStore = defineStore('auth', (): AuthStoreSetup
       authToken.value = undefined
       userEmail.value = undefined
       isAuthenticated.value = false
+      SubscriptionTrialService.clear()
 
       if (import.meta.client) {
         localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY)

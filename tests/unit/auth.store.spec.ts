@@ -177,6 +177,8 @@ describe('useAuthStore', (): void => {
     signOutMock.mockResolvedValue(undefined)
     disableAutoLoginMock.mockResolvedValue(undefined)
 
+    localStorage.setItem('metria_trial_ends_at', '2026-08-12T12:00:00.000Z')
+
     const store: ReturnType<typeof useAuthStore> = useAuthStore()
     await store.signIn({ email: 'ada@metria.app', password: 'secret' })
     await store.signOut()
@@ -185,10 +187,11 @@ describe('useAuthStore', (): void => {
     expect(store.authToken).toBeUndefined()
     expect(store.isAuthenticated).toBe(false)
     expect(localStorage.getItem('metria_auth_token')).toBeNull()
+    expect(localStorage.getItem('metria_trial_ends_at')).toBeNull()
     expect(disableAutoLoginMock).toHaveBeenCalled()
   })
 
-  it('applique le token après signUp', async (): Promise<void> => {
+  it('applique le token après signUp et démarre le placeholder essai local', async (): Promise<void> => {
     signUpMock.mockResolvedValue({
       type: 'bearer',
       value: 'signup-token',
@@ -204,6 +207,7 @@ describe('useAuthStore', (): void => {
 
     expect(store.authToken).toBe('signup-token')
     expect(store.isAuthenticated).toBe(true)
+    expect(localStorage.getItem('metria_trial_ends_at')).toBeTruthy()
   })
 
   it('rejette un token bearer vide', async (): Promise<void> => {

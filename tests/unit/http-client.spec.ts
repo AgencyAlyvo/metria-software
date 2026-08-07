@@ -83,6 +83,40 @@ describe('HttpClientService', (): void => {
     })
   })
 
+  it('invoque onPaymentRequired puis lève ApiHttpError sur HTTP 402', async (): Promise<void> => {
+    const onPaymentRequired: Mock = vi.fn()
+    HttpClientService.configure({
+      apiBaseUrl: 'http://localhost:8080',
+      /**
+       * Getter token de test.
+       * @returns {string | undefined} Token courant.
+       */
+      getAuthToken: (): string | undefined => authToken,
+      onPaymentRequired,
+    })
+    fetchMock.mockResolvedValue(jsonResponse(402, { detail: 'Subscription inactive', code: 'E_SUBSCRIPTION_INACTIVE' }))
+
+    await expect(HttpClientService.request('/usage')).rejects.toBeInstanceOf(ApiHttpError)
+    expect(onPaymentRequired).toHaveBeenCalledTimes(1)
+  })
+
+  it('n’invoque pas onPaymentRequired pour les autres erreurs HTTP', async (): Promise<void> => {
+    const onPaymentRequired: Mock = vi.fn()
+    HttpClientService.configure({
+      apiBaseUrl: 'http://localhost:8080',
+      /**
+       * Getter token de test.
+       * @returns {string | undefined} Token courant.
+       */
+      getAuthToken: (): string | undefined => authToken,
+      onPaymentRequired,
+    })
+    fetchMock.mockResolvedValue(jsonResponse(500, { detail: 'boom' }))
+
+    await expect(HttpClientService.request('/usage')).rejects.toBeInstanceOf(ApiHttpError)
+    expect(onPaymentRequired).not.toHaveBeenCalled()
+  })
+
   it('échoue si apiBaseUrl est absent', async (): Promise<void> => {
     HttpClientService.configure({
       apiBaseUrl: '',
